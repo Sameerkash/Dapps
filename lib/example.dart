@@ -118,7 +118,7 @@ class _ExampleState extends State<Example> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Hello World"),
+        title: Text("Ethereum Example"),
       ),
       body: RefreshIndicator(
         onRefresh: () {
