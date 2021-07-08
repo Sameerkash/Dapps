@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get_lucky_dapp/example.dart';
+import 'example.dart';
+import 'file_upload.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Example(),
+      home: FileUpload(),
     );
   }
 }
