@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: FileUpload(),
+      home: Dapp(),
     );
   }
 }
@@ -45,20 +45,17 @@ class _DappState extends State<Dapp> {
       body: PageView(
         controller: _pageController,
         children: [
-          Container(
-            child: Center(child: Text("Hello")),
-          ),
-          Container(
-            child: Center(child: Text("Hello2")),
-          ),
+          Example(),
+          FileUpload(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: setIndex,
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home")
+          BottomNavigationBarItem(icon: Icon(Icons.circle), label: "Example"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.circle), label: "File Upload")
         ],
       ),
     );

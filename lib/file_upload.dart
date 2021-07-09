@@ -4,6 +4,9 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get_lucky_dapp/root.dart';
+import 'package:http/http.dart';
+import 'package:web3dart/web3dart.dart';
 
 import 'ipfs/ipfs.wrapper.dart';
 
@@ -15,34 +18,59 @@ class FileUpload extends StatefulWidget {
 }
 
 class _FileUploadState extends State<FileUpload> {
+  late Client httpClient;
+  late Web3Client ethClient;
+  String rpcUrl = 'http://0.0.0.0:7545';
   File? file;
   String? fileName;
 
-  String? latestHash = "";
+  List<dynamic> files = [];
 
   @override
   void initState() {
+    init();
     super.initState();
   }
 
   void upload(File? file) async {
-    // try {
-    // final bytes = file.readAsBytesSync();
-
     print(file);
+  }
 
-    // print(addRes.body!.toJson());
+  Future<void> init() async {
+    await initialSetup("FileUpload.json");
+    await getContractFunctions();
+    await getFi();
+  }
 
-    final addRes = await IPFS.instance.add(file!.path..split(".").first, fileName!);
-    // print(addRes.body!.toJson());
-    // print(bytes);
+  late DeployedContract contract;
+  late ContractFunction getFiles, storeFile;
+
+  Future<void> getFi() async {
+    final result = await readContract(getFiles, [], contract);
+    print(result);
 
     setState(() {
-      // latestHash = addRes.body!.hash;
+      files = result[0];
     });
-    // } catch (e) {
-    //   print(e);
-    // }
+  }
+
+  Future<void> addFile() async {
+    final result = await IPFS.instance.add(file!.path, fileName!);
+    final String hash = result['Hash'];
+    await writeContract(storeFile, [fileName, hash], contract);
+    getFi();
+
+    setState(() {
+      file = null;
+    });
+  }
+
+  Future<void> getContractFunctions() async {
+    contract = DeployedContract(
+        ContractAbi.fromJson(abi, "FileUpload"), contractAddress);
+
+    storeFile = contract.function('storeFile');
+    getFiles = contract.function('getFiles');
   }
 
   void pickFile() async {
@@ -62,52 +90,84 @@ class _FileUploadState extends State<FileUpload> {
       appBar: AppBar(
         title: Text("IPFS File Upload"),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            child: file == null
-                ? Container(
-                    alignment: Alignment.center,
-                    height: 250,
-                    width: 250,
-                    child: Text("File will be displayed here"),
-                  )
-                : Container(
-                    alignment: Alignment.center,
-                    height: 250,
-                    width: 250,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        if (file!.path.contains('.jpg') ||
-                            file!.path.contains('.png') ||
-                            file!.path.contains('.jpeg'))
-                          Image.file(file!)
-                        else
-                          Text(fileName!)
-                      ],
-                    ),
+      body: RefreshIndicator(
+        onRefresh: () {
+          return getFi();
+        },
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                child: file == null
+                    ? Container(
+                        alignment: Alignment.center,
+                        height: 250,
+                        width: 250,
+                        child: Text("File will be displayed here"),
+                      )
+                    : Container(
+                        alignment: Alignment.center,
+                        height: 250,
+                        width: 250,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            if (file!.path.contains('.jpg') ||
+                                file!.path.contains('.png') ||
+                                file!.path.contains('.jpeg'))
+                              Image.file(file!)
+                            else
+                              Text(fileName!)
+                          ],
+                        ),
+                      ),
+              ),
+              TextButton(
+                onPressed: () {
+                  pickFile();
+                },
+                child: Text("Select File"),
+              ),
+              SizedBox(height: 20),
+              if (file != null)
+                TextButton(
+                  onPressed: () {
+                    addFile();
+                  },
+                  child: Text("Upload file"),
+                ),
+              // if (file != null) Text(latestHash!),
+              Container(),
+
+              Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Your Files",
+                      style: TextStyle(color: Colors.grey, fontSize: 25),
+                    )),
+              ),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemBuilder: (ctx, index) => ListTile(
+                  title: Text(files[index][0]),
+                  subtitle: Text(files[index][1]),
+                  leading: IconButton(
+                    onPressed: () {
+                      IPFS.instance.download(files[index][0], files[index][1]);
+                    },
+                    icon: Icon(Icons.download),
                   ),
+                ),
+                itemCount: files.length,
+              )
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              pickFile();
-            },
-            child: Text("Select File"),
-          ),
-          SizedBox(height: 20),
-          if (file != null)
-            TextButton(
-              onPressed: () {
-                upload(file!);
-              },
-              child: Text("Upload file"),
-            ),
-          if (file != null) Text(latestHash!),
-          Container()
-        ],
+        ),
       ),
     );
   }

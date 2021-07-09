@@ -33,6 +33,10 @@
 		</array>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>To upload files</string>
+		<key>LSSupportsOpeningDocumentsInPlace</key>
+		<true/>
+		<key>UIFileSharingEnabled</key>
+		<true/>
 		<key>UISupportedInterfaceOrientations</key>
 		<array>
 			<string>UIInterfaceOrientationPortrait</string>

@@ -1,8 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:get_lucky_dapp/root.dart';
 import 'package:http/http.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -23,7 +21,7 @@ class _ExampleState extends State<Example> {
 
   @override
   void initState() {
-    initialSetup();
+    init();
     super.initState();
   }
 
@@ -33,51 +31,21 @@ class _ExampleState extends State<Example> {
     super.dispose();
   }
 
-  Future<void> initialSetup() async {
-    httpClient = Client();
-    ethClient = Web3Client(rpcUrl, httpClient);
-
-    await getCredentials();
-    await getDeployedContract();
+  Future<void> init() async {
+    await initialSetup("Example.json");
     await getContractFunctions();
-
     await getN();
-  }
-
-  Future<void> getN() async {
-    final result = await readContract(getName, []);
-
-    print(result);
-
-    setState(() {
-      name = result.first;
-    });
-  }
-
-  String privateKey =
-      '7833c936550ca689f821e372260475516acd6cae8b4b239d03871edcf1c5cd49';
-  late Credentials credentials;
-  late EthereumAddress myAddress;
-
-  Future<void> getCredentials() async {
-    credentials = await ethClient.credentialsFromPrivateKey(privateKey);
-    myAddress = await credentials.extractAddress();
-  }
-
-  late String abi;
-  late EthereumAddress contractAddress;
-
-  Future<void> getDeployedContract() async {
-    String abiString = await rootBundle.loadString('abi/Example.json');
-    var abiJson = jsonDecode(abiString);
-    abi = jsonEncode(abiJson['abi']);
-
-    contractAddress =
-        EthereumAddress.fromHex(abiJson['networks']['5777']['address']);
   }
 
   late DeployedContract contract;
   late ContractFunction getName, setName;
+
+  Future<void> getN() async {
+    final result = await readContract(getName, [], contract);
+    setState(() {
+      name = result.first;
+    });
+  }
 
   Future<void> getContractFunctions() async {
     contract =
@@ -85,33 +53,6 @@ class _ExampleState extends State<Example> {
 
     getName = contract.function('getName');
     setName = contract.function('setName');
-  }
-
-  Future<List<dynamic>> readContract(
-    ContractFunction functionName,
-    List<dynamic> functionArgs,
-  ) async {
-    var queryResult = await ethClient.call(
-      contract: contract,
-      function: functionName,
-      params: functionArgs,
-    );
-
-    return queryResult;
-  }
-
-  Future<void> writeContract(
-    ContractFunction functionName,
-    List<dynamic> functionArgs,
-  ) async {
-    await ethClient.sendTransaction(
-      credentials,
-      Transaction.callContract(
-        contract: contract,
-        function: functionName,
-        parameters: functionArgs,
-      ),
-    );
   }
 
   @override
@@ -163,7 +104,7 @@ class _ExampleState extends State<Example> {
               TextButton(
                 onPressed: () async {
                   if (text.value.text.isNotEmpty)
-                    await writeContract(setName, [text.value.text]);
+                    await writeContract(setName, [text.value.text], contract);
                 },
                 child: Text("Change"),
               )

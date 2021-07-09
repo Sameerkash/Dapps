@@ -1,5 +1,6 @@
-var Example = artifacts.require('Example')
+var Example = artifacts.require("Example");
 
-module.exports = function(deployer) {
-  deployer.deploy(Example)
-}
+module.exports = function (deployer) {
+  deployer.deploy(Example);
+};
+
