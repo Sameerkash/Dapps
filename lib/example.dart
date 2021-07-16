@@ -37,7 +37,10 @@ class _ExampleState extends State<Example> {
     await getN();
   }
 
+  /// Declare contract instance
   late DeployedContract contract;
+
+  /// Declare contract functions
   late ContractFunction getName, setName;
 
   Future<void> getN() async {
@@ -51,6 +54,7 @@ class _ExampleState extends State<Example> {
     contract =
         DeployedContract(ContractAbi.fromJson(abi, "Example"), contractAddress);
 
+    /// Intialize contract functions
     getName = contract.function('getName');
     setName = contract.function('setName');
   }

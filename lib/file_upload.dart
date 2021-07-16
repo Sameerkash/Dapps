@@ -20,6 +20,8 @@ class FileUpload extends StatefulWidget {
 class _FileUploadState extends State<FileUpload> {
   late Client httpClient;
   late Web3Client ethClient;
+
+  /// url of Ganache instance
   String rpcUrl = 'http://0.0.0.0:7545';
   File? file;
   String? fileName;
@@ -42,7 +44,10 @@ class _FileUploadState extends State<FileUpload> {
     await getFi();
   }
 
+  /// Declare contract instance
   late DeployedContract contract;
+
+  /// Declare contract functions
   late ContractFunction getFiles, storeFile;
 
   Future<void> getFi() async {
@@ -164,7 +169,7 @@ class _FileUploadState extends State<FileUpload> {
                   ),
                 ),
                 itemCount: files.length,
-              )
+              ),
             ],
           ),
         ),

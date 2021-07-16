@@ -9,7 +9,10 @@ late Web3Client ethClient;
 String rpcUrl = 'http://0.0.0.0:7545';
 
 Future<void> initialSetup(String abiName) async {
+  // Initialize the HTTP client.
   httpClient = Client();
+
+// Initialize web3 client
   ethClient = Web3Client(rpcUrl, httpClient);
 
   await getCredentials();
@@ -21,6 +24,8 @@ String _privateKey =
     '7833c936550ca689f821e372260475516acd6cae8b4b239d03871edcf1c5cd49';
 late Credentials credentials;
 late EthereumAddress myAddress;
+
+/// abi instance
 late String abi;
 late EthereumAddress contractAddress;
 
@@ -35,10 +40,12 @@ Future<void> getDeployedContract(String fileName) async {
   var abiJson = jsonDecode(abiString);
   abi = jsonEncode(abiJson['abi']);
 
+  /// Get the contract address from the deployed contract
   contractAddress =
       EthereumAddress.fromHex(abiJson['networks']['5777']['address']);
 }
 
+/// Method to read the contract
 Future<List<dynamic>> readContract(ContractFunction functionName,
     List<dynamic> functionArgs, DeployedContract contract) async {
   var queryResult = await ethClient.call(
@@ -50,6 +57,7 @@ Future<List<dynamic>> readContract(ContractFunction functionName,
   return queryResult;
 }
 
+// Method to write to the contract
 Future<void> writeContract(ContractFunction functionName,
     List<dynamic> functionArgs, DeployedContract contract) async {
   await ethClient.sendTransaction(
