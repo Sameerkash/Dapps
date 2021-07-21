@@ -13,9 +13,6 @@ class Example extends StatefulWidget {
 
 class _ExampleState extends State<Example> {
   TextEditingController text = new TextEditingController();
-  late Client httpClient;
-  late Web3Client ethClient;
-  String rpcUrl = 'http://0.0.0.0:7545';
 
   String name = "";
 
