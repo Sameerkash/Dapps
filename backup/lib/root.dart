@@ -35,6 +35,7 @@ Future<void> getCredentials() async {
 }
 
 Future<void> getDeployedContract(String fileName) async {
+  print(fileName);
   String abiString = await rootBundle.loadString('abi/$fileName');
   var abiJson = jsonDecode(abiString);
   abi = jsonEncode(abiJson['abi']);

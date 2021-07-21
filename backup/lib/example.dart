@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_lucky_dapp/root.dart';
+import 'package:http/http.dart';
 import 'package:web3dart/web3dart.dart';
 
 class Example extends StatefulWidget {
@@ -84,7 +85,7 @@ class _ExampleState extends State<Example> {
               Container(
                 padding: EdgeInsets.all(15),
                 child: Text(
-                  name, //name
+                  name,
                   style: TextStyle(fontSize: 22),
                 ),
               ),
