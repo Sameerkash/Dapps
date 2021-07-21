@@ -21,7 +21,7 @@ Future<void> initialSetup(String abiName) async {
 
 /// globally scoped variables
 String _privateKey =
-    '7833c936550ca689f821e372260475516acd6cae8b4b239d03871edcf1c5cd49';
+    '0cab7a67362eb841efb842af74c5b8208558b452cbed8cff316c221a9c744222';
 late Credentials credentials;
 late EthereumAddress myAddress;
 
